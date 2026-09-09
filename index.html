@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detektif Pemilah Sampah - Game Edukasi Arcade</title>
+  <!-- Google Fonts untuk Nuansa Retro Arcade & Ceria -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ==========================================
+       RESET & BASE STYLES (Light Mode Retro)
+       ========================================== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      font-family: 'Fredoka', sans-serif;
+      background-color: #FFF9E6; /* Background ceria krem terang */
+      background-image: radial-gradient(#FFD54F 15%, transparent 16%);
+      background-size: 24px 24px;
+      color: #2C3E50;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 15px;
+    }
+
+    .game-container {
+      width: 100%;
+      max-width: 900px;
+      background: #FFFFFF;
+      border: 5px solid #222222;
+      border-radius: 16px;
+      box-shadow: 8px 8px 0px #222222;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ==========================================
+       HEADER SECTION
+       ========================================== */
+    header {
+      text-align: center;
+      background: #FFECB3;
+      padding: 15px;
+      border: 4px solid #222222;
+      border-radius: 12px;
+      box-shadow: 4px 4px 0px #222222;
+    }
+
+    header h1 {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.2rem;
+      color: #E65100;
+      text-shadow: 2px 2px 0px #FFE082;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    header p {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #424242;
+    }
+
+    /* ==========================================
+       HUD (HEADS-UP DISPLAY) & CONTROLS
+       ========================================== */
+    .hud-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .hud-card {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.75rem;
+      padding: 12px 16px;
+      border: 3px solid #222222;
+      border-radius: 8px;
+      box-shadow: 3px 3px 0px #222222;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .score-card {
+      background-color: #A5D6A7; /* Hijau cerah */
+      color: #1B5E20;
+    }
+
+    .target-card {
+      background-color: #81D4FA; /* Biru cerah */
+      color: #01579B;
+    }
+
+    .btn-arcade {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.7rem;
+      padding: 12px 18px;
+      background-color: #FF8A65;
+      color: #FFF;
+      border: 3px solid #222222;
+      border-radius: 8px;
+      box-shadow: 4px 4px 0px #222222;
+      cursor: pointer;
+      transition: all 0.1s ease;
+    }
+
+    .btn-arcade:hover {
+      background-color: #FF7043;
+      transform: translate(-1px, -1px);
+      box-shadow: 5px 5px 0px #222222;
+    }
+
+    .btn-arcade:active {
+      transform: translate(3px, 3px);
+      box-shadow: 1px 1px 0px #222222;
+    }
+
+    /* ==========================================
+       FEEDBACK BANNER
+       ========================================== */
+    .feedback-banner {
+      min-height: 50px;
+      background: #ECEFF1;
+      border: 3px dashed #222222;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 15px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 1.05rem;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .feedback-banner.success {
+      background-color: #C8E6C9;
+      color: #2E7D32;
+      border-style: solid;
+      border-color: #2E7D32;
+    }
+
+    .feedback-banner.wrong {
+      background-color: #FFCDD2;
+      color: #C62828;
+      border-style: solid;
+      border-color: #C62828;
+    }
+
+    /* ==========================================
+       TRASH ITEMS AREA
+       ========================================== */
+    .items-section {
+      background: #FFFDE7;
+      border: 3px solid #222222;
+      border-radius: 12px;
+      padding: 15px;
+      box-shadow: 3px 3px 0px #222222;
+    }
+
+    .items-section h3 {
+      font-size: 0.9rem;
+      font-family: 'Press Start 2P', cursive;
+      color: #F57F17;
+      margin-bottom: 12px;
+      text-align: center;
+    }
+
+    .items-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      min-height: 90px;
+    }
+
+    .trash-item {
+      width: 100px;
+      height: 85px;
+      background: #FFFFFF;
+      border: 3px solid #222222;
+      border-radius: 10px;
+      box-shadow: 3px 3px 0px #222222;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .trash-item:hover {
+      transform: translateY(-4px) scale(1.05);
+      box-shadow: 5px 5px 0px #222222;
+      background-color: #FFF9C4;
+    }
+
+    .trash-item:active {
+      cursor: grabbing;
+    }
+
+    .trash-item.dragging {
+      opacity: 0.4;
+    }
+
+    .trash-item.selected {
+      border: 4px solid #FF9800;
+      background-color: #FFE0B2;
+      transform: scale(1.08);
+    }
+
+    .trash-icon {
+      font-size: 2rem;
+      line-height: 1;
+    }
+
+    .trash-name {
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-top: 4px;
+      text-align: center;
+    }
+
+    /* ==========================================
+       TRASH BINS AREA
+       ========================================== */
+    .bins-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+    }
+
+    .bin {
+      border: 4px solid #222222;
+      border-radius: 14px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      box-shadow: 5px 5px 0px #222222;
+      transition: transform 0.2s, background-color 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+    }
+
+    /* Bin Organik */
+    .bin-organik {
+      background-color: #E8F5E9;
+      border-color: #2E7D32;
+    }
+    .bin-organik .bin-header {
+      color: #1B5E20;
+    }
+
+    /* Bin Anorganik */
+    .bin-anorganik {
+      background-color: #E1F5FE;
+      border-color: #0288D1;
+    }
+    .bin-anorganik .bin-header {
+      color: #01579B;
+    }
+
+    /* Bin B3 */
+    .bin-b3 {
+      background-color: #FFEBEE;
+      border-color: #D32F2F;
+    }
+    .bin-b3 .bin-header {
+      color: #B71C1C;
+    }
+
+    .bin-icon {
+      font-size: 2.8rem;
+      margin-bottom: 5px;
+    }
+
+    .bin-header {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.85rem;
+      margin-bottom: 6px;
+    }
+
+    .bin-desc {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #555;
+    }
+
+    /* Drag Over Animation */
+    .bin.drag-over {
+      transform: scale(1.05);
+      box-shadow: 8px 8px 0px #222222;
+      animation: pulse 0.6s infinite alternate;
+    }
+
+    .bin-organik.drag-over { background-color: #C8E6C9; }
+    .bin-anorganik.drag-over { background-color: #B3E5FC; }
+    .bin-b3.drag-over { background-color: #FFCDD2; }
+
+    @keyframes pulse {
+      0% { transform: scale(1.03); }
+      100% { transform: scale(1.07); }
+    }
+
+    /* ==========================================
+       MODAL POPUP (STAGE CLEAR)
+       ========================================== */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .modal-content {
+      background: #FFF;
+      border: 5px solid #222;
+      border-radius: 16px;
+      box-shadow: 8px 8px 0px #222;
+      padding: 30px;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+      animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.5); }
+      100% { transform: scale(1); }
+    }
+
+    .modal-content h2 {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1rem;
+      color: #2E7D32;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+
+    .modal-content p {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+    }
+
+    .final-score {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1.2rem;
+      color: #E65100;
+      background: #FFF8E1;
+      padding: 10px;
+      border: 2px solid #222;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    /* RESPONSIVE DESIGN FOR SMALL SCREENS */
+    @media (max-width: 600px) {
+      header h1 { font-size: 0.95rem; }
+      .hud-container { justify-content: center; }
+      .trash-item { width: 85px; height: 80px; }
+      .trash-icon { font-size: 1.6rem; }
+      .trash-name { font-size: 0.68rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="game-container">
+    <!-- HEADER -->
+    <header>
+      <h1>🔍 DETEKTIF PEMILAH SAMPAH 🗑️</h1>
+      <p>Ayo bantu jaga bumi! Tarik sampah ke tempat sampah yang cocok.</p>
+    </header>
+
+    <!-- HUD (SCOREBOARD & CONTROLS) -->
+    <div class="hud-container">
+      <div class="hud-card score-card">
+        SKOR: <span id="score-text">0</span>
+      </div>
+      <div class="hud-card target-card">
+        TARGET: <span id="target-text">0</span>/6
+      </div>
+      <button id="reset-btn" class="btn-arcade">🔄 Reset Stage</button>
+    </div>
+
+    <!-- FEEDBACK BANNER -->
+    <div id="feedback-banner" class="feedback-banner">
+      <span id="feedback-text">💡 Tarik sampah di bawah ini atau ketuk sampah lalu ketuk tempatnya!</span>
+    </div>
+
+    <!-- TRASH ITEMS CONTAINER -->
+    <div class="items-section">
+      <h3>📦 BARANG SAMPAH:</h3>
+      <div id="items-container" class="items-container">
+        <!-- Item akan dimasukkan oleh JS -->
+      </div>
+    </div>
+
+    <!-- BINS CONTAINER -->
+    <div class="bins-container">
+      <!-- ORGANIK -->
+      <div class="bin bin-organik" data-category="organik">
+        <div class="bin-icon">🍏</div>
+        <div class="bin-header">ORGANIK</div>
+        <div class="bin-desc">Sisa Makanan, Kulit Buah, Daun Kering</div>
+      </div>
+
+      <!-- ANORGANIK -->
+      <div class="bin bin-anorganik" data-category="anorganik">
+        <div class="bin-icon">🥤</div>
+        <div class="bin-header">ANORGANIK</div>
+        <div class="bin-desc">Plastik, Botol Kaca, Kaleng Bekas</div>
+      </div>
+
+      <!-- B3 -->
+      <div class="bin bin-b3" data-category="b3">
+        <div class="bin-icon">⚠️</div>
+        <div class="bin-header">B3 (BERBAHAYA)</div>
+        <div class="bin-desc">Baterai, Lampu, Obat & Kimia</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL SUKSES -->
+  <div id="win-modal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2>🎉 HEBAT! STAGE SELESAI! 🎉</h2>
+      <p>Kamu adalah Detektif Pemilah Sampah yang hebat!</p>
+      <div class="final-score">SKOR: <span id="final-score-val">0</span></div>
+      <button id="play-again-btn" class="btn-arcade">🎮 Main Lagi</button>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT GAME LOGIC -->
+  <script>
+    /* ==========================================
+       DATABASE ITEM SAMPAH
+       ========================================== */
+    const trashDatabase = [
+      // ORGANIK
+      { id: 'o1', name: 'Kulit Pisang', category: 'organik', icon: '🍌' },
+      { id: 'o2', name: 'Sisa Apel', category: 'organik', icon: '🍎' },
+      { id: 'o3', name: 'Tulang Ikan', category: 'organik', icon: '🦴' },
+      { id: 'o4', name: 'Daun Kering', category: 'organik', icon: '🍂' },
+      { id: 'o5', name: 'Roti Basi', category: 'organik', icon: '🍞' },
+      
+      // ANORGANIK
+      { id: 'a1', name: 'Botol Plastik', category: 'anorganik', icon: '🥤' },
+      { id: 'a2', name: 'Kaleng Minuman', category: 'anorganik', icon: '🥫' },
+      { id: 'a3', name: 'Kantong Plastik', category: 'anorganik', icon: '🛍️' },
+      { id: 'a4', name: 'Kardus Bekas', category: 'anorganik', icon: '📦' },
+      { id: 'a5', name: 'Botol Kaca', category: 'anorganik', icon: '🍾' },
+      
+      // B3 (BERBAHAYA DAN BERACUN)
+      { id: 'b1', name: 'Baterai Bekas', category: 'b3', icon: '🔋' },
+      { id: 'b2', name: 'Lampu Bohlam', category: 'b3', icon: '💡' },
+      { id: 'b3', name: 'Botol Pestisida', category: 'b3', icon: '🧴' },
+      { id: 'b4', name: 'Obat Kadaluarsa', category: 'b3', icon: '💊' },
+      { id: 'b5', name: 'Termometer Raksa', category: 'b3', icon: '🌡️' }
+    ];
+
+    /* ==========================================
+       GAME STATE
+       ========================================== */
+    let score = 0;
+    let sortedCount = 0;
+    const totalTarget = 6;
+    let currentItems = [];
+    let draggedItemId = null;
+    let selectedItemElement = null; // Untuk mendukung klik/tap pada perangkat layar sentuh
+
+    /* ==========================================
+       WEB AUDIO SYNTH (EFFECT SUARA RETRO)
+       ========================================== */
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+
+    function playArcadeSound(type) {
+      try {
+        if (!audioCtx) audioCtx = new AudioCtx();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'correct') {
+          // Suara retro positif (+100)
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(400, now);
+          osc.frequency.exponentialRampToValueAtTime(800, now + 0.15);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'wrong') {
+          // Suara retro salah (-20)
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now);
+          osc.frequency.linearRampToValueAtTime(110, now + 0.2);
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+          osc.start(now);
+          osc.stop(now + 0.2);
+        } else if (type === 'win') {
+          // Melodi kemenangan
+          const notes = [523.25, 659.25, 783.99, 1046.50];
+          notes.forEach((freq, i) => {
+            const noteOsc = audioCtx.createOscillator();
+            const noteGain = audioCtx.createGain();
+            noteOsc.type = 'triangle';
+            noteOsc.frequency.value = freq;
+            noteOsc.connect(noteGain);
+            noteGain.connect(audioCtx.destination);
+            const startTime = now + i * 0.1;
+            noteGain.gain.setValueAtTime(0.2, startTime);
+            noteGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.25);
+            noteOsc.start(startTime);
+            noteOsc.stop(startTime + 0.25);
+          });
+        }
+      } catch (e) {
+        // Fallback jika audio diblokir browser
+      }
+    }
+
+    /* ==========================================
+       DOM ELEMENTS
+       ========================================== */
+    const scoreText = document.getElementById('score-text');
+    const targetText = document.getElementById('target-text');
+    const itemsContainer = document.getElementById('items-container');
+    const bins = document.querySelectorAll('.bin');
+    const feedbackBanner = document.getElementById('feedback-banner');
+    const feedbackText = document.getElementById('feedback-text');
+    const resetBtn = document.getElementById('reset-btn');
+    const winModal = document.getElementById('win-modal');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const finalScoreVal = document.getElementById('final-score-val');
+
+    /* ==========================================
+       GAME FUNCTIONS
+       ========================================== */
+
+    // Inisialisasi atau Reset Stage Game
+    function initGame() {
+      score = 0;
+      sortedCount = 0;
+      draggedItemId = null;
+      selectedItemElement = null;
+      updateHUD();
+      winModal.classList.add('hidden');
+      
+      showFeedback('💡 Tarik sampah di bawah atau ketuk sampah lalu pilih tempatnya!', 'normal');
+
+      // Ambil 6 item acak (2 Organik, 2 Anorganik, 2 B3 agar adil)
+      const organikItems = trashDatabase.filter(i => i.category === 'organik').sort(() => 0.5 - Math.random()).slice(0, 2);
+      const anorganikItems = trashDatabase.filter(i => i.category === 'anorganik').sort(() => 0.5 - Math.random()).slice(0, 2);
+      const b3Items = trashDatabase.filter(i => i.category === 'b3').sort(() => 0.5 - Math.random()).slice(0, 2);
+
+      currentItems = [...organikItems, ...anorganikItems, ...b3Items].sort(() => 0.5 - Math.random());
+
+      renderItems();
+    }
+
+    // Render item ke dalam layar
+    function renderItems() {
+      itemsContainer.innerHTML = '';
+      currentItems.forEach(item => {
+        const itemEl = document.createElement('div');
+        itemEl.classList.add('trash-item');
+        itemEl.setAttribute('draggable', 'true');
+        itemEl.dataset.id = item.id;
+        itemEl.dataset.category = item.category;
+        itemEl.dataset.name = item.name;
+
+        itemEl.innerHTML = `
+          <div class="trash-icon">${item.icon}</div>
+          <div class="trash-name">${item.name}</div>
+        `;
+
+        // Event Listener Drag & Drop
+        itemEl.addEventListener('dragstart', handleDragStart);
+        itemEl.addEventListener('dragend', handleDragEnd);
+
+        // Fallback Aksesibilitas Klik/Tap (HP & Tablet)
+        itemEl.addEventListener('click', handleItemClick);
+
+        itemsContainer.appendChild(itemEl);
+      });
+    }
+
+    // Update Skor & Target HUD
+    function updateHUD() {
+      scoreText.textContent = score;
+      targetText.textContent = `${sortedCount}`;
+    }
+
+    // Tampilkan Banner Umpan Balik Dinamis
+    function showFeedback(message, type) {
+      feedbackText.textContent = message;
+      feedbackBanner.className = 'feedback-banner'; // reset class
+      if (type === 'success') {
+        feedbackBanner.classList.add('success');
+      } else if (type === 'wrong') {
+        feedbackBanner.classList.add('wrong');
+      }
+    }
+
+    /* ==========================================
+       DRAG AND DROP HANDLERS
+       ========================================== */
+    function handleDragStart(e) {
+      draggedItemId = this.dataset.id;
+      this.classList.add('dragging');
+      e.dataTransfer.setData('text/plain', this.dataset.id);
+
+      // Bersihkan seleksi klik
+      if (selectedItemElement) {
+        selectedItemElement.classList.remove('selected');
+        selectedItemElement = null;
+      }
+    }
+
+    function handleDragEnd() {
+      this.classList.remove('dragging');
+    }
+
+    // Bin Drop Area Handlers
+    bins.forEach(bin => {
+      bin.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        bin.classList.add('drag-over');
+      });
+
+      bin.addEventListener('dragleave', () => {
+        bin.classList.remove('drag-over');
+      });
+
+      bin.addEventListener('drop', (e) => {
+        e.preventDefault();
+        bin.classList.remove('drag-over');
+        
+        const itemId = e.dataTransfer.getData('text/plain') || draggedItemId;
+        const targetBinCategory = bin.dataset.category;
+        
+        processSort(itemId, targetBinCategory);
+      });
+
+      // Klik pada Bin (Support Layar Sentuh / Tap)
+      bin.addEventListener('click', () => {
+        if (selectedItemElement) {
+          const itemId = selectedItemElement.dataset.id;
+          const targetBinCategory = bin.dataset.category;
+          processSort(itemId, targetBinCategory);
+        }
+      });
+    });
+
+    // Handler Klik Item (Sistem Pilih & Ketuk)
+    function handleItemClick() {
+      if (selectedItemElement === this) {
+        this.classList.remove('selected');
+        selectedItemElement = null;
+      } else {
+        if (selectedItemElement) selectedItemElement.classList.remove('selected');
+        selectedItemElement = this;
+        this.classList.add('selected');
+        showFeedback(`📌 ${this.dataset.name} dipilih! Sekarang ketuk Tempat Sampah yang sesuai.`, 'normal');
+      }
+    }
+
+    /* ==========================================
+       LOGIKA PENILAIAN & EVALUASI
+       ========================================== */
+    function processSort(itemId, targetCategory) {
+      const itemIndex = currentItems.findIndex(i => i.id === itemId);
+      if (itemIndex === -1) return;
+
+      const item = currentItems[itemIndex];
+      const categoryNames = {
+        organik: 'Organik',
+        anorganik: 'Anorganik',
+        b3: 'B3 (Berbahaya)'
+      };
+
+      if (item.category === targetCategory) {
+        // BENAR: +100 poin
+        score += 100;
+        sortedCount += 1;
+        playArcadeSound('correct');
+        showFeedback(`🎉 BENAR! ${item.icon} ${item.name} adalah sampah ${categoryNames[item.category]}! (+100)`, 'success');
+
+        // Hapus item yang berhasil dipilah
+        currentItems.splice(itemIndex, 1);
+        selectedItemElement = null;
+        renderItems();
+        updateHUD();
+
+        // Cek Apakah Stage Selesai
+        if (sortedCount === totalTarget) {
+          setTimeout(handleStageClear, 500);
+        }
+      } else {
+        // SALAH: -20 poin (skor minimal 0 agar ramah anak)
+        score = Math.max(0, score - 20);
+        playArcadeSound('wrong');
+        showFeedback(`❌ UPS! ${item.icon} ${item.name} BUKAN sampah ${categoryNames[targetCategory]}! (-20)`, 'wrong');
+        
+        if (selectedItemElement) {
+          selectedItemElement.classList.remove('selected');
+          selectedItemElement = null;
+        }
+        updateHUD();
+      }
+    }
+
+    // Handler Selesai Stage
+    function handleStageClear() {
+      playArcadeSound('win');
+      finalScoreVal.textContent = score;
+      winModal.classList.remove('hidden');
+    }
+
+    /* ==========================================
+       EVENT LISTENERS BUTTON
+       ========================================== */
+    resetBtn.addEventListener('click', () => {
+      initGame();
+    });
+
+    playAgainBtn.addEventListener('click', () => {
+      initGame();
+    });
+
+    // Mulai Game Pertama Kali
+    initGame();
+  </script>
+</body>
+</html>
